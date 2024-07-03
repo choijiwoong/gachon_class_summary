@@ -1,0 +1,238 @@
+[week2]
+1. 입력 시 space나 엔터도 고려해서 scanf(" %c")처럼 센스있게 처리!
+
+[week3] 
+*1. 양수를 입력받아 끝자리부터 출력(1234->4321)
+int num=12345;
+while(num>0){
+	printf("%d",num%10);
+	num/=10;
+}
+
+2. 저장된 배열에서 자신의 등수만 필요할 때 rank=1으로 시작하여 자기보다 크면++
+3. pow함수 만들기
+
+[week4]
+1. 실수데이터를 정수 sum에 누산할 경우 버려지는 값의 합은?
+2. 최대 공약수 구하기
+int gcd(int a, int b){
+    if (b==0) return a;
+    return gcd(b, a%b);
+}
+3. 프로그램 명령  인수 int main(int argc, char* argv[])에서 기본적으로 경로를 담기에 argc는 1이다.
+4. 파일 입출력 File* infile=fopen(argv[1], "r")가 null이면 못연겨. 읽을 때는 while(fscanf(infile, "%d %d", &a, &b)!=EOF){} 
+   쓸때는 fprintf(out, "%d %d\n", a, b);
+
+[week5]
+*1. 하노이의 탑
+void hanoi(int n, char a, char c, char b){
+    if (n==1)
+	printf("Move disk from %c to %c\n", a, c);
+    else{
+	hanoi(n-1, a, b, c);
+	hanoi(1, a, c, b);
+	hanoi(n-1, b, c, a);
+    }
+}
+2. 선택정렬: min_idx로 좌측 iter을 가리키며, 그 뒤의 원소 중 가장 작은 값의 인덱스를 찾음. 그 후 min_idx와 swap
+
+[week6]
+1. 이진탐색 while(left<=right)일 때 mid=(left+right)/2와 비교하여 맞으면 mid리턴하고 아니면 -1
+   무조건 정렬되어 있어야 하기에 정렬안돼있으면 정렬부터 하고해야함.
+2. 정수 연속적 계산기: 연산자와 숫자를 구분하는 함수가 필요하며, 나누기 예외처리해주기
+*3. 실수형 연속 계산기
+
+[week7]
+1. 구조체
+typedef struct member{
+    int id;
+    char name[20];
+    float score;
+} example;
+*2. 마방진: 첫번째 줄 중앙에 1을 두고, 왼쪽 대각선으로 가며 +1수를 넣고 벗어나면 0->n-1로 바꿈. 이미 수가 있다면 아래칸으로 내림
+3. 랜덤함수 srand((unsigned int)time(NULL))하고 rand()%100+rand()%100/100.0는 소수점 두자리 실수 만들기
+4. 중복되지 않는 랜덤 알파벳 출력하기(26개)
+
+[마방진]
+#define MAX_SIZE 15
+#include <stdio.h>
+#include <stdlib.h>
+
+void make_msquare(int table[][MAX_SIZE], int n){
+	int r=0; 
+	int c=(n-1)/2;
+	table[r][c]=1;
+	
+	for(int digit=2; digit<=n*n; digit++){
+		int row=r-1;
+		int col=c-1;
+		if(row<0)
+			row=n-1;
+		if(col<0)
+			col=n-1;
+			
+		if(table[row][col]){
+			r++; // 규칙에 의해 이 값은 무조건 범위(n-1)을 넘지 않는듯! 그냥 외우자
+		} else{
+			r=row;
+			c=col;
+		}
+		table[r][c]=digit;
+	}
+}
+
+void display(int table[][MAX_SIZE], int n){
+	for(int r=0; r<n; r++){
+		for(int c=0; c<n; c++)	
+			printf("%5d", table[r][c]);
+		printf("\n");
+	}
+}
+
+int main(){
+	int sum=0, n;
+	int table[MAX_SIZE][MAX_SIZE];
+	
+	printf("Enter a number: ");
+	scanf("%d", &n);
+	
+	**if( (n<1) || (n > MAX_SIZE) ){
+		printf("Error! size is out of range.\n");
+		exit(0);
+	}
+	**if(!(n%2)){
+		printf("Error! size is even.\n");
+		exit(0);
+	}
+	
+	**for(int r=0; r<n; r++)
+		for(int c=0; c<n; c++)
+			table[r][c]=0;
+	
+	make_msquare(table, n);
+	display(table, n);
+	
+	for(int c=0; c<n; c++)
+		sum+=table[0][c];
+	
+	printf("Row/Column/Diagonal Sum=%d\n",sum);
+	
+}
+
+[실수형 연속 계산기]
+#include <stdio.h>
+#include <math.h>
+
+#define STAGE1 0
+#define STAGE2 1
+#define STAGE3 2
+#define EPSILON 0.000001
+#define MAX_LENGTH 10
+
+double get_real(double current_operand, char c, int status){
+	int part1;
+	double part2;
+	
+	if(status==0){
+		part1=c-'0';
+		current_operand*=10;
+		current_operand+=part1;
+	} else{
+		part2=c-'0';
+		part2*=pow(10, -status);
+		current_operand+=part2;
+	}
+	return current_operand;
+}
+
+
+int is_operator(char c){
+	if(c=='+'||c=='-'||c=='*'||c=='/'||c=='^')
+		return 1;
+	return 0;
+}
+
+int is_digit(char c){
+	if(c>='0' && c<='9')
+		return 1;
+	return 0;
+}
+
+double real_operation(char op, double operand1, double operand2){
+	double result;
+	switch(op){
+		case '+':
+			result=operand1+operand2;
+			break;
+		case '-':
+			result=operand1-operand2;
+			break;
+		case '*':
+			result=operand1*operand2;
+			break;
+		case '/':
+			result=operand1;
+			if(operand2!=0)
+				result=operand1/operand2;
+			break;
+		case '^':
+			result=pow(operand1, operand2);
+			break;
+	}
+	return result;
+}
+
+void real_calculator(){
+	double operand1=0, operand2=0, result;
+	char op, c;
+	int current_stage=STAGE1, status=0;
+	
+	while((c=getchar())!='x'){
+		if(current_stage == STAGE1){//STAGE1
+			if(is_digit(c)){
+				operand1=get_real(operand1, c, status);
+				if(status!=0)
+					status++;
+			} else if(is_operator(c)){
+				op=c;
+				current_stage=STAGE2;
+				status=0;
+				operand2=0;
+			} else if(c=='.')
+				status=1;
+		} else if(current_stage == STAGE2){//STAGE2
+			if(is_digit(c)){
+				operand2=get_real(operand2, c, status);
+				if(status!=0)
+					status++;
+			} else if(c=='.'){
+				status=1;
+			} else if(c=='\n'){
+				result=real_operation(op, operand1, operand2);
+				if(result/1.000 - (int) result <EPSILON)
+					printf("= %.f", result);
+				else{
+					printf("= %.3f", result);
+					current_stage=STAGE3;
+					status=0;
+				}
+			}
+		} else if(current_stage==STAGE3){//STAGE3
+			if(c=='\n'){
+				operand1=0;
+				current_stage=STAGE1;
+			} else if(is_operator(c)){
+				op=c;
+				current_stage=STAGE2;
+				operand1=result;
+				operand2=0;
+			}
+		}
+	}
+}
+int main(){
+	printf("계산기 프로그램을 시작합니다.\n");
+	printf("실수형의 피연산자와 사칙연산자 중 하나를 입력하시오.\n");
+	real_calculator();
+	printf("\n계산기 프로그램을 종료합니다.\n");
+}

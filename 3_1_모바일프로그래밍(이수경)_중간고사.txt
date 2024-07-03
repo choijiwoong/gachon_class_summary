@@ -1,0 +1,153 @@
+[Chap01. 안드로이드의 개요와 개발 환경 설치]
+*1. 응용 프로그램은 SDK, 시스템 응용 프로그램은 NDK, 하드웨어 제어 및 리눅스 커널 관련은 PDK 개발 툴킷을 사용한다.
+  - 응용 프로그램: 일반적인 앱
+  - 응용 프로그램 프레임워크: 하드웨어 접근 시 사용되는 안드로이드 API
+  - 안드로이드 런타임: Java코어 라이브러리와 달빅 가상 머신 혹은 아트 런타임으로 구성된다. 
+			     안드로이드는 Java나 Kotlin문법으로 프로그래밍하지만, JVM없이 달빅 가상 머신이나 아트 런타임을 사용함.
+  - 라이브러리: 시스템 접근을 위해 C로 작성되어 세밀한 조작으로 성능이 뛰어나다(NDK)
+  - 리눅스 커널: 메모리 관리, 디바이스 드라이버, 보안 등의 하드웨어 저수준 관리 기능(PDK)
+2. 인텔 HAXM: Hyper-V로 하드웨어 가속을 통해 에뮬레이터 성능을 올린다.
+
+[Chap02. 처음 만드는 안드로이드 애플리케이션]
+1. activity_main.xml에 자동 생성되는 레이아웃은 ConstraintLayout이다.
+2. 프로젝트 생성 시 설정하는 Minimum API level은 앱이 작동하는 최하 버전을 의미한다.
+3. android:layout_height, android:layout_width에 "wrap_content"나 "match_parent"로 설정해준다. android:id="@+id/button1"
+4. 자주 사용하는 문자열은 strings.xml에 <string name="buttonHint">버튼이에요!</string>으로 등록하여 "@string/buttonHint"처럼 사용가능하다
+5. MainActivity.kt의 기본 코드 구성은 아래와 같다. 위의 버튼을 누르면 메시지가 뜨는 코드 예시이다.
+class MainActivity : AppCompatActivity(){
+    lateinit var button : Button
+    override fun onCreat(savedInstanceState: Bundle?){
+	super.onCreate(savedInstanceState)
+	setContentView(R.layout.activity_main)
+	button=findViewById<Button>(R.id.button1)
+	button.setOnClickListener{
+	    Toast.makeText ( applicationContext, "버튼을 눌렀어요", Toast.LENGTH_SHORT ) .show()
+	}
+    }
+}
+*6. 프로젝트 디렉토리 기능
+  - java폴더: MainActivity.kt가 들어있음
+  - java 혹은 res (generated)폴더: 시스템 내부적으로 사용
+  - res폴더: 이미지, 레이아웃, 문자열 등이 들어가는 폴더. 이 안의 mipmap폴더는 런처 아이콘 파일이 들어가며 values폴더에는 문자열, 색상표, 스타일 등이 저장된다.
+  - manifests폴더: 앱의 여러 정보를 담고있는 중요한 파일로 변경가능
+  - Gradle Scripts폴더에는 빌드파일이 들어있으며 핵심파일인 build.gradle과 SDK경로가 있는 local.properties, JVM메모리가 설정됀 gradle.properties가 있다.
+
+[Chap03. 안드로이드를 위한 Kotlin 문법]. ***반복 시 :가 아닌 in을 사용한다.
+1. 타입은 대문자로 시작한다. Char(2byte로 한글도 표현가능), String, Byte, Short, Int, Long, Float, Double, Boolean
+2. 변수 선언 시 초기화하지 않는다면 데이터 형식을 반드시 명세해야하며, 초기화한다면 타입표시하지않아도 된다.(float만 10.1f로 리터럴 쓰자)
+3. var은 일반 변수고, val은 단 한번의 값대입만 가능하다.
+4. 캐스팅은 "100".toInt()나 "100.123".toDouble()을 사용한다.
+5. 기본적으로 null이 불가능하기에 선언 시 var okNull:Int?=null처럼 타입에 ?를 붙여야만 null대입이 가능하다.
+6. switch 대신 when을 사용하며 값1->으로 표현한다. 여러개의 값 값1, 값2->도 가능하며, in 60 .. 100 ->처럼 범위도 가능하다
+7. 배열은 var one=Array<Int>(크기, {초기값})으로, 이차원 배열은 var two=Array<IntArray>(3, {IntArray(4)})로 가능하다.
+   값을 바로 대입하려면 var three: IntArray=intArrayOf(1,2,3)으로 사용하며, 모든 배열은 .add()메서드와 .get()메서드를 지원한다. []도 가능
+8. 반복문은 for (i in 0..10 step 2)과 for ( elem in three.indices나 three.size )로 크기만큼의 첨자 접근이 가능하다. for (elem in three)로 원소 접근도 가능하다.
+9. 함수 표현 fun addFunction(num1: Int, num2: Int): Int{}처럼 반환값을 표현!
+10. 예외 처리는 try{} catch(e: ArithmetiicException){ println("나누기 0 에러!") }처럼 사용한다. 타입만 뒤에 붙여준다는거 유의
+*11. 참고로 연산자 중 and or xor inv()는 비트연산이며, shl과 shr는 비트 시프트 연산이다.
+*12. 클래스의 생성자는 constructor(color: String)처럼 명시적으로 선언한다. 생성자 메서드 오버로딩도 가능.
+*13. 클래스 내부의 companion object{}는 공용으로, 그 안의 변수를 static field, 메서드는 static method, 그 안에 const val로 선언된 값을 const field라고 부른다.
+*14. 부모를 super class, 자식을 sub class라고 부른다. 상속은 class Automobile: Car{}로 표시하며, override를 sub class에서 하려면 super class와 메서드가 open으로 선언되어야만 한다.
+*15. 추상 메서드를 포함하는 추상 클래스는 abstract 키워드를 사용하며, 별도의 open키워드 없어도 된다. 추상클래스 상속 시 class Automodile: Car()로 괄호를 붙인다. 오버라이딩 시 override를 붙이자.
+*16. 인터페이스는 interface iAnimal{ abstract fun eat() }처럼 선언하고, Kotlin은 다중상속을 지원하지 않지만 추상클래스와 인터페이스를 둘 다 사용하여 비슷하게 구현은 가능하다.(메서드 내부에 abstract 키워드 붙여야하는거 유의)
+*17. 람다식은 { num1: Int, num2: Int -> println("출력!"); num1+num2 }로 표시한다. 여러 줄이라면 ;로 구분하며, 마지막 문장은 자동 반환된다.
+	반환타입 명시하고 싶으면 val lambda : (Int, Int) -> (Int) = {x:Int, y:Int->(x+y)}처럼 담을 타입에 반환타입을 명시!
+18. var strList=ArrayList<String>(4); strList.add("hi")처럼도 가능하다.
+19. 문자열 비교는 str.equals("hi")를 사용한다.
+20. 날짜 형식
+var now=Date()
+var sFormat=SimpleDateFormat("yyyyMMdd HH:mm:ss") //20240420 09:12:16
+println(sFormat.format(now))
+21. Array<Int>와 IntArray는 다르다!
+22. 이차원 배열은 val array=arrayOf( arrayOf(1, 2, 3), arrayOf(2,3,4))로도 가능하고, val array2=Array(3, {IntArray(3, {2})}) 타입은 알아서! 대충 둘이 어느정도는 호환되는듯 Array가 인터페이스 IntArray가 구현체 느낌..보다는 IntArray는 sum(), average()등을 사용가능하며, Array<Int>는 일반 표준 함수사용가능. 
+   웬만해서 배열 담을 때 자동추론하게 두자.
+
+[chap04. 기본 위젯 익히기]
+1. VIew(위젯)클래스는 안드로이드 화면에서 사용되는 모든 것들이 상속하고있다(코드상에서 뷰, 화면상에서 위젯이라한다)
+*2. 레이아웃은 위젯을 담아 배치하는 위젯이다. View를 상속받는 ViewGroup클래스를 상속받는다. 최상위 클래스는 Object이다.
+3. ListView, GridView, TabHost, Gallery를 뷰 컨테이너라고 한다.
+4. View클래스의 주요 XML속성(android): id="@+id/btn1" layout_width="wrap_content" background="$ff0000" text="@string/welcome_msg"
+5. <LinearLayout xmlns:android="http~" xmlns:tools="http~" 대충 너비랑 높이 android:orientation="vertical">
+6. <LinearLayout> <Button> <TextView> <RadioButton> <ImageView> <RadioButton> <CheckBox> <EditText> <ToggleButton>
+7. id를 지정하는 조건은 터치했을 때 어떤 동작이 필요한 경우 ex) Button, RadioButton, CheckBox
+8. XML속성값을 직접 지정하는 경우 px는 해상도. 1080x1920에 너비를 1090px 높이를 1920px로 하면 match_parent와 동일
+9. 색상은 "#RRGGBB"로 나타낸다.
+*10. padding속성을 레이아웃에 적용하면, 내부 위젯들이 padding만큼 안쪽으로 배치된다. 즉, Button에 padding을 적용하면, 버튼 경계선과 글자간격.
+*11. 위젯 간격을 주고 싶다면 layout_margin="20dp"처럼 주면 된다. padding은 위젯 내부느낌이라면 layout_margin은 외부느낌.
+*12. visivility="invisible | visible | gone"에서 invisible은 보이지만 않는거고 gone은 안보이는데 위젯 자리마저 없앤다.
+*13. enabled과 clickable속성을 부울값으로 조정할 수 있으며, Button의 경우 기본값이 "true" "true"이다
+*14. rotation="45"로 시계방향 위젯 회전이 가능하다.
+15. TextView 활용 종결
+*<TextView text="hi" textColor="#00FF00" textSize="7px" typeface="serif" textStyle="bold|italic" singleLine="true"/>
+var tv1: TextView=findViewById<TextView>(R.id.textView1); tv1.setSingleLine(); tv1.setTextColor(Color.RED); tv1.setTextSize(30.0f); 
+tv1.setTypeface(android.graphics.Typeface.SERIF, android.graphics.Typeface.BOLD_ITALIC)
+16. myButton.setOnClickListener{ 람 다 }
+*17. <EditText>활용 종결 var myStr : String=findViewById<EditText>(R.id.edittext).getText().toString()으로 getText한 후 toString과정이 필요하다!
+     그리고 android:hint옵션도 있뜸
+*18. 원시타입 말고(lateinit은 null과 비교구문이 있는데 원시는 참조가 아니기에) 
+    클래스에 한해서 lateinit var edit1: EditText처럼 lateinit을 사용하는 이유는(val은 불가능한데, val은 var과 달리 setter가 없다. lateinit은 setter를 사용)
+    반드시 초기화되고 이후에 사용한다는 제약을 걸어 findViewById에 실패했을 경우 오류를 발생시키기 위함. (내부적으로 lateinit시 null로 초기화시킴)
+    또한, Kotlin은 nullable한 값의 경우 Type?로 표시해야하는데, 약속을 했기에 Type형식의 변수를 그대로 사용할 수 있어 특별히 nullable처리가 필요없다
+*19. null값이 나왔다면 변수의 타입에 ?가 있는지 예민하게 반응하자!!!
+20. setOnClickListener{는 클릭만을} setOnTouchListenr(는 손가락 방향, 드래그 방향 등 세세한 설정가능)
+21. 계산기 btnAdd.setOnTouchListener{ view, motionEvent -> { // setOnClickListener와 달리 입력값 2개.
+	edit1.text.toString()으로도 가능하네? 그리고 숫자로 바꿀떄는 
+	Integer.parseInt(num1)로 사용 결과도 마찬가지로 (toInt()와 동일!)
+	textResult.text="계산결과"+result.toString();
+	false
+}
+22. 실수 계산기에 값을 입력하지 않고 버튼을 클릭할 때 오류메시지를 토스트 메시지로 나타내고 계산하지 않게하려면? *numberInput.text.toString().trim().isEmpty()로 비교! Toask.makeText(this, "nonono", Toast.LENGTH_SHORT).show()
+***	ㄴ무조건 .text는 String을 의미하는게 아니라 내용값(Editable)을 의미하는 거기에 .toString()이 필요하다.
+
+***23. CompoundButton은 버튼 클래스를 상속받으며, 여러가지에 상속되는 클래스로 예로써, 독립적으로 작동하는 CheckBox는 checked옵션으로 초기값을 가져올 수 있고 변경시 이벤트를 mycheck.setOnCheckedChangeListener{ compoundButton, b -> }으로 핸들할 수 있다.
+24. Switch(두칸터치시 드래그 스위치)와 ToggleButton(한칸스위치)은 checked옵션으로 on off를 설정할 수 있다.
+25. 여러개 중 하나만 선택해야하는 경우 RadioGroup으로 RadioButton을 묶어 사용하며, 가끔 라디오 그룹의 .clearCheck()로 체크된 것을 모두 해제한다
+각 라디오 버튼의 id속성이 있어야 하며, 없을 경우 해제되지 않는다.
+    ***고로, when (radioGroup.checkedRadioButtonId){처럼 radioGroup의 메서드 .checkedRadioButtonId로 아이디를 when으로 가져와 해당되는 경우 처리한다.
+		*****R.id.RdoDog->imgPet.setImageResource(R.drawable.dog)
+	}
+***26. ImageView, ImageButton에 사용되는 이미지들은 res/drawable에 있어야 하며, src="@drawable/logo.png"로 사용한다.
+    그 외 속성으로 scaleType="matrix | fitXY(width와 height에 맞춤) | fitStart | fitEnd | fitCenter(가운데정렬)"와 maxHeight="100px" maxWidth="100px"가 있다.
+27. 버튼들 리스터 정리: setOnClickListener{}, setOnTouchListener{view, event->{}}, setOnCheckedChangeListener{compoundButton, b -> {}}
+
+[Chap05. 레이아웃 익히기]
+1. 레이아웃 속성: orientation, gravity(좌우측정렬방향), padding, layout_weight(중복될때 우선순위), baselinieAligned(보기좋게 정렬)
+*2. 레이아웃 종류: Linear, Relative, Table, Grid, Frame(겹쳐서 배치) 피피티 7페이지 사진 
+3. <LinearLayout gravity="right|bottom">으로하면 내부 위젯들이 오른쪽 아래 기준으로 배치
+*4. <Button layout_gravity="right">로 하면 부모레이아웃 기준 어디에 위치시킬지를 개별로 설정 가능. left, center, right, bottom, top이 가능하지만 부모 레이아웃의 orientation을 고려하면 최소한의 layout_gravity로 문제풀 수 있을거임
+5. <LinearLayout baselineAligned="false">로 하면 버튼들이 유도리있게 보기좋은 위치로 안감. 자동정렬해제로 이해하면 될듯
+
+***6. 중복 LinearLayout 시 전부 match_parent로 하면 처음 레이어만 표시되고 나머지는 무시되는 논리오류 발생(겹쳐서) 이를 해결하기 위해 layout_height="wrap_content"로 해도 되지만, 그러면 높이가 꽉 차진 않기에 그대로 "match_parent"로 하고 layout_weight="1"로 동등하게 주면 3개가 알아서 쫙 보인다. 5-2 풀어보기 p. 20
+***7. XML없이 화면구성
+*val params=LinearLayout.LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT )
+val baseLayout=LinearLayout(this)//바인딩
+baseLayout.orientation=LinearLayout.VERTICAL
+baseLayout.setBackgoundColor(Color.rgb(0,255,0))
+
+var btn=Button(this)//바인딩
+btn.text="버튼"
+btn.setBackgroundColor(Color.MAGENTA)
+
+baseLayout.addView(btn)
+btn.setOnClickListener{ Toast.makeText(applicationContext, "코드로 생성한 버튼", Toast.LENGTH_SHORT).show() }
+
+***setContentView(baseLayout, params)
+**88. <RelativeLayout>안에 정렬 시 <Button 부모레이아웃 기준으로는 P.27의 그림을 꼭 참고. 규칙이 있다! layout_centerInParent조심
+**9. 특정위젯 기준으로는 layout_align방향은 기준위젯 기준안에서이고, above below toLeftOf toRightOf는 그 바깥 영역이다. p29참고
+***피피티 31페이지만 해보자. 1번은 이해됐는데, 2번은 layout_below="@+id/baseBtn1" layout_above="@+id/baseBtn2"로는 애매하니, layout_alignParentRight를 혼용해서 사용한거 중요
+***RelativeLayout에서는 Gravity사용하지 말자
+10. 테이블 레이아웃 속성: layout_span="2"열을 합쳐서 표시, layout_column="3"지정한 곳에 현재 위젯을 표시(순차적으로 안했을 때), stretch_Columns="*" 각 셀을 같은 크기로 확장해서 전체 화면을 채워줘
+******11. <TableLayout> <TableRow> <Button layout_column="1"> <Button layout_span="2">한칸 띄고 1개버튼, 긴버튼 1개 총 두개. column은 0부터 시작! 그리드의 layout_rowSpan, layout_columnSpan과 달리 그냥 layout_span이다
+12. 코틀린 internal은 접근제한자 느낌의 가시성 변경자인데, 같이 컴파일되는 모듈 내에서 볼 수 있다는 뜻이다.
+**13. 계산기 예지 페이지 43. for루프 돌려서 ArrayList<Button>에 아이디로 넣는거 numButtons.add(findViewById<Button>(numBtnIDs[i])
+for 루프 돌려서 모든 버튼에 이벤트리스너 등록하는데, *********edit1에 isFocuese==True면 edit1.text.toString()에 버튼글자numButtons[i].getText().toString()값으로 edit1.setText()해서 타자입력시켜주는거 중요!!
+***14. 그리드 레이아웃은 layout_column과 layout_row를 직접 지정해서 표형태처럼 사용.
+<GridLayout columnCount="4" rowCount="2">로 행열크기를 입력해주고 버튼에서 layout_rowSpan, columnSpan등으로 크기를 지정하며, ***어느 방향으로 늘릴지를 layout_gravity="fill_horizontal | fill_vetical"로 알려준다.
+15. 프레임 레이아웃은 왼쪽 상단부터 겹쳐서 출력하며, <FrameLayout foreground="@drawable/dog" foregroundGracity="center | fill_horizontal"로 이미지 넣을 수 있다. 그 외 모든 것들은 좌측 상단에 출력! 씨발 끗!!!!!!! 중간고사 1트 성공했어용 엉엉엉덩이를 내리면 문이 열린다.
+
+
+
+
+
+
+

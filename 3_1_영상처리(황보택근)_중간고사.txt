@@ -1,0 +1,134 @@
+[chap1]
+1. 디지털 영상: 밝기값과 위치값을 가진 일정 수의 화소들
+
+[chap2]_기본파이썬
+
+[chap3]
+1. np.full(shape, val, dtype=np.float32)#마지막 값으로 앞의 shape를 채움
+2. np.ravel(b)는 b.flatten()과 동일하며, b.reshape(-1)은 np.reshape(b, (-1))과 동일
+3. np.random.rand(1)는 shape를 그냥 순서대로 받는데, 1짜리 shape로 인식. 0~1사이 실수값  np.random.randint(0,50, size=500)는 0~49까지
+*4(10번). np.unique(ndarray, return_counts=True)로 고유 원소들의 빈도수를 받을 수 있고, 그 리턴값 고유 원소들에 unique[np.argsort(-count)]처럼 하여 빈도수가 큰 값이 앞에오게 내림차순 정렬한 다음, 빈도수 역시 count[np.argsort(-count)]로 정렬한다음 출력가능.
+
+[chap4]
+*1. cv2.namedWindow()의 두번째 flags는 크기 조절&맞춤 가능한 cv2.WINDOW_NORMAL과 무조건 픽스인 cv2.WINDOW_AUTOSIZE
+2. cv2.ellipse(image, (center_x, center_y), (radius_x, radius_y), rotation_angle, start_ho, end_ho, color, ...)
+3. cv2.setMouseCallback(windowName, onMouse)# onMouse(event, x, y, flags, param)
+4. cv2.createTrackbar(trackbarName, windowName, init_val, max, onChange)	#onChange(pos)
+5. cv2.line(image, (x1, y1), (x2, y2), color, thickness) # 색상까지는 필수 요소다!
+6. cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness, line_style, 좌표 >>시프트)
+7. cv2.putText(image, text, (x,y)_문자열 좌측 하단 기준, font, scale, color, thickness, line_style)
+8. cv2.circle(image, (x,y), radius, color) #참고로 모든 thickness에 -1넣으면 안쪽 색 채움
+9. cv2.setTrackbarPos("Brightness", title, cv2.getTrackbarPos("Brightness", title) - 10)
+10. cv2.imread(src, cv2.IMREAD_GRAYSCALE); 
+11. cv2.imwrite("test.jpg", image, (cv2.IMWRITE_JPEG_QUALITY, 100)); cv2.imwrite("test.png", image, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+12. capture.set(cv2.CAP_PROP_ZOOM, value) cv2.CAP_PROP_FOCUS, cv2.CAP_PROP_BRIGHTNESS, cv2.CAP_PROP_CONTRAST
+capture=cv2.VideoCapture(0)
+if not capture.isOpened(): raise Exception("앙대")
+while True:
+    ret, frame=capture.read()
+    if not ret:
+	break
+    if cv2.waitKey(30)>=0:
+	break
+    코드
+capture.release()
+13. 동영상 저장
+fourcc=cv2.VideoWriter_fourcc(*"DIVX")
+writer=cv2.VideoWriter("result.avi", fourcc, fps=15, size=(640, 280))
+...(생략) frame=cv2.flip(frame, 1)#좌우뒤집기 1, 상하뒤집기 0
+14. 영상반복 cv2.repeat(image, ny, nx)#y먼저!
+15. 영상회전 cv2.transpose(src)#반시계방향 90도 회전
+
+[chap5]
+1. r g, b배열들을 (r, g, b)로 합쳐주는 cv2.merge(r, g, b) / (r, g, b)를 r, g, b로 분리하는 cv2.split(m)
+2. cv2.add(), cv2.subtract(), cv2.multiply()에는 mask인자를 전달할 수 있다. cv2.addWeighted(src1, alpha, src2, beta, gamma)
+3. cv2.reduce(src, dim, rtype)에 dim이 0이면 열방향, 1이면 행방향 연산, rtype은 cv2.REDUCE_SUM, cv2.REDUCE_AVG, cv2.REDUCE_MAX, cv2.REDUCE_MIN
+4. 위에 화소 조작하면서는 image+(0,0,255)가 됐지만, 리스트인 [1,2,3]+[4,5,6]은 [1,2,3,4,5,6]이 되기에 cv2.add(np.array([1,2,3]), )처럼 사용 flatten도 넣쟝
+*5. 채널을 분리해서 색깔별 이미지를 표현하려면 split만으로는 부족하다! empty=np.zeros([shape[0], shape[1]], dtype=np.uint8)을 merge로
+   b=cv2.merge([b, empty, empty])즉 3-channel로 만들어야한다. 그렇지 않으면 gray-scale이미지만 얻는다!
+6. 마스크 제작 시 빈 배열에 꽉찬 도형을 그리고, 비트연산을 통해 cv2.bitwise_and(image, mask)로 계산가능.
+*7. frame=cv2.resize(frame, (320, 240))처럼 변환가능. frame.reshape()는 모양만 바뀌는거지 축소 및 확장이 불가능하다. 이는 cv2.resize!!
+8. 밝기증가 cv2.add(region1, (50, 50, 50)) 대비증가 region2=cv2.multiply(resion2, (1.5, 1.5, 1.5))
+*9. size=[rect[2]*rect[3] for rect in rectangles]#참고로 rectangles는 x,y,width,height담긴 튜플. 
+   sorted_index=cv2.sortIdx(np.array(size), cv2.SORT_EVERY_ROW+cv2.SORT_EVERY_COLUMN) # np.argsort와 유사! flag를 전달한다 정도
+   for i in sorted_index.flatten(): print(rectangles[i]) #뭔가 처리하면 flatten붙이자!
+**10. 연립방정식 암기!!
+left=np.array([2,6,3, -5,5,1, 2,-3,5], dtype=np.float32).reshape(3,3)#으로 차례대로 계수들만 모음
+right=np.array([2,10,28], dtype=np.float32)#으로 우항들만 모음
+ret, inv=cv2.invert(left)#좌측 방정식들의 역함수를 구함. 
+if ret:
+    print(inv.dot(right).flatten())#역함수에 우항을 넣어 해를 구하는데, flatten()해서 출력
+else:
+    print("역행렬없어요")
+11. 사각형 회전
+theta=20*np.pi/180 # 회전할 각도를 라디안으로 변환
+rot_mat=np.array([
+    [np.cos(theta), -np.sin(theta)],#코-싸 싸코!
+    [np.sin(theta), np.cos(theta)]
+], np.float32)
+#pts2 = np.dot(rot_mat, pts1.transpose()).transpose()
+pts2 = cv2.gemm(pts1, rot_mat, 1, None, 1, flags=cv2.GEMM_2_T)
+pts2=cv2.gemm(pts1, rot_mat, 1, None, 1, flags=cv2.GEMM_2_T)
+12. 두개 점 zip으로 묶고(튜플화) enumerate(인덱스도)로 i, val1, val2 가져오기 for i, (pt1, pt2) in enumerate(zip(pts1, pts2)):
+13. cv2.convertScaleAbs(src, alpha=1.5, beta=-50)으로 하면 1.5배한뒤 -50. cv2.addWeighted(src1, 1.5 0, 0, -50)과 동일
+14. cv2.absdiff(image1, image2)로 두 영상의 차분을 얻을 수 있다.
+15. cv2.polylines(image, [np.int32(xys)], True, color, thickness)에서 xys는 말 그대로 좌표들의 나열이며, 3번째 인자는 도형 막혀있는지!
+16. 사각형 회전 예제는 사진 참고
+
+[chap6]
+1. 흑백영상과 명암도영상의 차이
+2. 행렬의 덧셈만 사용하면 saturation연산으로 255이상의 값이 흰색으로 나타나기에 cv2.addWeigheted()로 합성비율을 조절한다.
+3. 명암대비는 두 색의 경계에서 차이가 강조되는 것으로, 1.0이상 혹은 이하의 값을 곱하여 조절한다.
+4. 화소의 분포를 나타내는 지표인 히스토그램으로 영상의 특성을 판단할 수 있다.
+*5. 히스토그램 스트레칭은 영상의 대비가 좋지않은 영상들의 min, max화소값의 위치를 기반으로 0과 255로 매핑하여 조정한다. (화소-low)/(hith-low)*255
+6. calc_histo는 hsize(bins)과 ranges, gap으로 서로를 계산한 뒤 for i in (image/gap).flat:값을 hist[int(i)]+=1로 계산한다. 이미지를 gap으로 나누고 핀다음 인자로 넣는것
+7. draw_histo는 cv2.normalize(hist, hist, 0, shape[0], cv2.NORM_MINMAX)로 정규화하고 gap=hist_img.shape[1]/hist.shape[0]으로 현재 그리려는 최대크기로 
+   찾고, for value, count in enumerate(hist):로 값과 빈도수를 가져오고 x=int(round(i*gap)); w=int(round(gap)); 으로 시작좌표와 폭을 얻어내 
+   cv2.rectangle(hist_img, (x, 0, w, int(h)), 0, cv2.FILED)
+   return cv2.flip(hist_img, 0)으로 계산한다.
+8. 히스토그램 평황화는 명암대비를 증가시켜 인지도를 높여 화질을 개선하는 곳으로, 히스토그램 빈도값마다 누적합/전체누적합*최대화소값으로 명암분포를 균등하게 분배한다.
+9. 점진적으로 짙어지는 영상은 모든 화소값에 나누기를 해서 256이 되게하는게 0~255 1간격이고, 그 나눗셈에 *배수//배수하면 간격이 늘어나며, 
+10. 명암도 영상 생성하는거는 두가지가 있다고 생각하자. 0~1과 0~255. 위의 두가지는 j자체와 계단현상을, 마지막은 /512로 나누어 0~125를 표현한 것이다.
+    image1[i,j]=j//1 # 0~255까지 1간격(몫)
+    image2[i,j]=j//10*10 # 0~255까지 20간격(몫)
+    image3[i,j]=j/512 # 0~255까지 0.5간격(나눈값)
+11. calc_histo(image, channels, bsize, ranges):
+	shape=bsize if len(channels)>1 else (bsize[0], 1)#채널이 1초과면 bsize(bins)로, 채널이 하나면 컬러랑 shape맞춰야하니 (bsize[0], 1)
+	hist=np.zeros(shape, np.float32)#소수!
+	gap=np.divide(ranges[1::2], bins)#gap계산 시 range를 bsize값으로 나눈다
+	for row in range: for val in row:#각 화소의 rgb채널값에 대하여
+		idx=np.divide(val[channels], gap).astype('uint8')#gap으로 나눈뒤 int로 만든다.
+		hist[tuple(idx)]+=1#해당하는 부분에 +1
+	return hist
+12. reduce는 dim=0이면 열방향압축, dim=1이면 행방향 압축을 수행한다.
+    수직프로젝션(열방향 압축) cv2.reduce(image, dim=0, rtype=cv2.REDUCE_SUM, dtype=cv2.CV_32S)
+    수평프로젝션(행방향 압축) cv2.reduce(image, dim=1, rtype=cv2.REDUCE_SUM, dtype=cv2.CV_32S)#rtype명시 중요.
+	만약 히스토그램 출력하려하면 아직은 histo가 아닌 (?, 1)짜리이기에 .squeeze()로 변환한 후 넣어야한다.
+13. 컬러타입 변환 cv2.cvtColor(BGR_img, cv2.COLOR_BGR2GRAY | cv2.COLOR_BGR2YCrCb, cv2.COLOR_BGR2YUV, cv2.COLOR_BGR2LAB)
+14번은 모르겠음
+
+[chap7]
+1. 회선(Conv)은 입력 영상의 각 화소에서 마스크 크기의 화소들을 마스크 원소의 비율만큼 반영하는 연산을 모든 화소값에 대해 이동하며 수행하는 것
+2. 블러링은 화소값이 급격하게 변하는 부분들을 점진적으로 변하게 하여 부드러운 느낌을 주는 것으로 모든 마스크를 1/nxn으로 하면된다.
+3. 샤프닝은 이웃 화소의 차이를 키우는 것으로 샤프닝 마스크는 중심만 크고 나머지 -1 -2로 맞춘것
+4. 급격히 변하는 부분을 검출하는 1차 미분 마스크에 사용되는 에지 검출 방법: 
+  로버츠		   프리윗		    소벨
+-100  00-1		-101	-1-1-1	-101	1-21
+ 010  010		-101	 0 0 0		-202	0 00
+ 000  000		-101	 1 1 1		-101	1 21
+로버츠: 차분을 한번만 계산하여 차분 크기가 작고, 경계가 확실한 것만 추출하지만 잡음에 민감하다
+프리윗: 세번의 차분을 합하여 엣지가 강조되며, 수직과 수평을 동일하게 찾지만 대각선을 잘 못찾는다
+소벨  :  중심계수 차분의 비중을 2배로 늘려 수직과 수평, 대각선을 잘 검출한다.
+5. 회선 구현에서는 cv2.multiply(rot, mask)이루 dst[i, j]=cv2.sumElems(tmp)[0] 반복! cv2.sumElems(는) 채널별 합을 tuple로 건네주는데, tmp는 gray-scale이기에 어차피 1개값이어서 [0]으로 가져온거
+6. 블러링과 샤프닝의 적용은 회선 알고리즘을 이용해서 블러링마스크(1/n*n)과 샤프닝 마스크(-1-1-1-1+8-1-1-1-1)를 적용해주기만 하면 된다.
+
+
+
+
+
+
+
+
+
+
+

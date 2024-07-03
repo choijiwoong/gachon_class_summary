@@ -1,0 +1,149 @@
+[Chap06. 고급 위젯 다루기]
+1. <AnalogClock> <DigitalClock><Chronometer format="시간 측정: %s">타이머 형식의 위젯 .start() .stop() .reset()메서드
+    처음에 리스너에서 chrono.base=SystemClock.elapsedRealTime()초기화해야한다.
+2. <TimePicker timePickerMode="spinner">에서 가져올 때 .currentHour과 .currentMinute로 가져올 수 있음 <DatePicker datePickerMode="spinner"> feat. <TimePickerDialog>
+3. <CalendarView showWeekNumber="false"> 현재 몇주차인지 출력하는건데 false로 하는게 깔끔(기본은 true)
+    calView.setOnDateChangeListener{ view, year, month, dayOfMonth->{ selectMonth=month+1 } 월은 0부터 시작하기에 +1해줘야함
+    그리고 출력할 때는 tvHour.text=Integer.toString()처럼 문자열로.
+4.  <RadioGroup> <RadioButton id>
+5. tPicker.visibility=View.INVISIBLE로 안보이게 초기설정 가능
+
+6. 자동완성텍스트뷰: 단어 1개가 자동완성 / 멀티자동완성텍스트뷰: ,로 구분하여 여러 단어가 자동 완성. 자동완성 단어설정 .setAdapter()메서드
+<AutoCompleteTextView completionHint="선택" completionThreshold="2" hint="자동완성!"> <MultiCompleteTextView>
+arrayOf로 items저장한 다음, ArrayAdapter(this, R. ... . xml파일, items)로 adapter를 만들고 autocompleteTextView.setAdapter(adapter)로 설정.
+<MultiAutoCompleteTextView>는 토크나이저와 어댑터 뿐 아니라 토크나이저를 설정해줘야하는데, multi.setTokenizer()에 MultiAutoCompleteTextView.CommaTokenizer()를 넣으면 된다.
+
+7. 프로그레스바의 원형태는 진행중임만 알 수 있음, 시크바는 사용자임의조절가능, 레이팅바
+<ProgressBar style="?android:attr/progressBarStyleHorizontal" max="100" progress="20" secondaryProgress="50"/>
+<SeekBar progress="20"/> <RatingBar numStars="5" rating="1.5" stepSize="0.5"/>
+
+8. 스크롤 뷰에는 단 하나의 위젯만을 넣을 수 있기에 리니어 레이아웃을 사용한다. <ScrollView xmlns:and="~" "fill_parent">
+9. 슬라이딩드로어는 위젯을 서랍처럼 열어서 보여주거나 닫아서감춘다.
+<SlidingDrawer handle="handle_name" content="content_name"> // 핸들과 콘텐트!!
+    <Button id="handle_name"/> // 서랍 손잡이_이미지 뷰, 버튼
+    <LinearLayout id="content_name> // 내부 내용
+
+10. 뷰플리퍼는 여러 위젯을 배치하고 화면을 오른쪽 왼쪽으로 미는거
+<ViewFlipper> 하고 와리가리하는 이벤트콜백에서 vFlipper.showPrevious() vFlipper.showNext()하면 됨.
+
+11. 탭호스트: 여러 탭을 두고 각 탭을 클릭하면 해당 화면이 나옴. 이때 각 아이디는 tabhost, tabs, tabcontent로 고정되어 있다.
+코틀린에서는 등록만 해주면 된다. 탭스팩은 탭을 구성하는 요소들의 집합이다. 탭호스트 안에 탭 위젯 그냥 두고, 프레임에 리니어로 컨텐츠.
+그 후 코틀린에서 this.tabHost불러온 뒤 .newTabSpec("SONG")메서드에 .setIndicator("음악별")까지 한 뒤 .setContent(R.id.tabSong)까지 설정한 뒤 tabHost.addTab(tabSpecSong)으로 추가. tabHost.currentTab=0
+
+12. 액션바는 허니콤부터 지원되며 다양한 크기의 화면을 디자인하는데에 활용. 프래그먼트를 사용함. 프래그먼트는 액티비티보다 작은 단위 화면으로 소형화면에서는 화면분할보다 화면을 동적으로 추가하거나 제거하는 데에 사용함. MainActivity: ActionBar.TabListener를 추가.
+
+this.supportActionBar로 상단의 액션바를 준비하고, bar!!.navigationMode=ActionBar.NAVIGATION_MODE_TABS로 초기화한다.
+tabSong=bar.newTab()으로 탭을 생성하고 tabSong.text="음악별"글자설정 후 tabSong.setTabListener(this) 탭 리스너로 this를 설정. bar.addTab(tabSong)으로 액션바에 탭을 추가한다.
+
+class MyTabFragment: androidx.fragment.app.Fragment(){
+	onCreate에 var data=arguments, tabName=data!!.getString("tabName")으로 현재 누른 탭이름을 가져온다.
+	onCreateView에 var params=LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)하고 var baseLayout=LinearLayout(super.getActivity())로 현재의 액티비티를 넣는다. 그 후 baseLayout.orientation=LinearLayout.VERTICAL설정하고  baseLayout.layoutParams=params로 레이어의 매개변수들을 넣어준다.
+}
+
+13. var myFrags=arrayOfNulls<MyTabFragment>(3)후 onTabSelected에서 myFrag[tab.position]==null이라면 myTabFrag=MyTabFragment()로 생성하고 val data=Bundle(), data.putString("tabName", tab.text.toString()), myTabFrag.arguments=data, myFrag[tab.position]=myTabFrag를 수행하여 세팅. 만약 있다면 myTabFrag=myFrags[tab.position]으로 가져오기만 함.
+    맨 마지막에 ft.replace(android.R.id.content, myTabFrag!!)수행
+
+14. 웹뷰 <WebView/> 매니패스트 파일 application안에 activity에 label="간단 웹브라우저" 추가하면 액션바에 타이틀생김. 로고는 아이콘아래에 logo=""로 설정 코틀린에서는 web.webViewClient=CookWebViewClient()하고 var webSet=webSettings; webSet.builtInZoomControls=true하고 검색콜백에서 web.loadUrl(edtUrl.test.toString())하면 됨. .goBack()
+class CookWebViewClient : WebViewClient(){
+	override fun shouldOverrideUrlLoading(){ **각이다**
+		return super.shouldOverrideUrlLoading(view, url) **각이다**
+	}
+}
+참고로 매니패스트 파일에 <uses-permission android:name="android.permission.INTERNET"/>인터넷 권한을 줘야한다.
+
+[Chap07. 메뉴와 대화상자]
+1. 옵션메뉴:로 목록이 많으면 위쪽으로 쌓이며, 스크롤 가능 / 컨텍스트 메뉴: 롱클릭하면 나오는 메뉴
+    - 메뉴<menu> <item/> xml 파일을 이용하는 방식: 코틀린에서 onCreateOptionsMenu() 오버라이딩으로 메뉴 파일을 등록하고, onOptionsItemSelected() 오버라이딩으로 메뉴 선택 시 동작할 내용을 코딩
+	ㄴonCreateOptionsMenu()에서는 menuInflater.inflate(R.menu.menu1, menu)) 후 리턴
+	ㄴonOptionsItemSelected()에서는 when (item.itemId){ R.id.item1->{ return true }}꼴로 아이디를 비교하고 리턴
+    - 코틀린만으로는 onCreateOptionsMenu에서 menu!!.add(0,1,0,"글자") 로 두번째 인자에 아이디를 주고, menu.addSubMenu("버튼변경")에서 반환되는 SubMenu객체에 add를 통해 하위메뉴를 추가한다. onOptionaItemSelected에서는 마찬가지로 1->.. 2->...
+
+2. 컨텍스트 메뉴는 롱클릭하면 나오는 메뉴로 xml만들고 onCreate안에 registerForContextMenu(button1 as Button)로 메뉴위젯을 등록하고 onCreateContextMenu()오버라이딩으로 메뉴 파일을 등록하고 onContextItemSelected()오버라이딩으로 선택시 동작을 코딩한다.
+    메뉴 XML파일은 위젯마다 별도의 파일로 만들어야한다. onCreateContextMenu()메서드 오버라이딩 시에는 menuInflater에 inflate시킬 파일들이 나뉘어 있기에 v===위젯1인지를 하나하나 확인해서 수행
+
+3. 토스트: 디버깅 용도도 적당하며 Toast.makeText(Context context, String message, int duration).show()로 사용한다. Toast.LENGTH_LONG또는 SHORT를 사용. Toast.makeText를 show하지 않고 저장한 뒤 Toast.setGravity(Gravity.TOP or Gravity.LEFT, xOffset, yOffset)으로 위치 조정하고 show()호출.
+
+4. 대화상자는 확인,취소 사용자 선택을 받음. AlertDialog.Builder(this@MainActivity)로 생성하고 set Title, Message, Icon, Positivebutton, NegativeButton, Items, SingleChoiceItemsm, MultiChiceItems등 설정이 가능하다. .show()로 출력. 
+    확인이나 취소 콜백은 {dialog, which->로}하고 setItems(versionArray){dialog, which->로 하는데 which가 인덱스이름임
+    setSingleChoiceItems(versionArray, 0_초기선택인덱스)->로 인자만 하나 늘어난게 차이점으로 항목을 선택해도 닫히지 않게할 때 사용.
+    setMultiChoiceItems(versionArray, checkArray){ dialog, which, isChecked->}가 차이.
+xml에서 불러오기 위해서 맨 처음 dialogView=View.inflate(this@MainActivity, R.layout.dialog1, null)은 필수! 그리고 선택한거 찾을 땐 dialogView.findViewById로 해당 항목 찾고 .text.toString()으로 가져오면 됨.
+    이때 토스트 메시지를 출력하고 싶으면 Toast(this@MainActivity)로 토스트를 가져온 다음에, View.inflate(this@MainActivity, R.layout.toast1, null)로 뷰를 가져와서 원하는 작업(항목찾고 메시지 설정)을 수행한 뒤 가져온 토스트에 .view=toastView뷰를 등록하고 .show()
+
+[Chap 08. 파일처리]
+1. 내장 메모리: /data/data/패키지/files에 저장되고 readDiary(fName: String): String?의 코드는 try catch (e : IOException)으로 감싸고 inFs=openFileInput(fName); var txtr=ByteArray(30); inFs.read(txt) inFs.close() str=txt.toString(Charsets.UTF_8).trim() 쓰기는 outFs=openFileOutput(fileName, Context.MODE_PRIVATE)하고 outFs.write(str.toByteArray()) close가 끝
+2. 현재 날짜를 알기위해서는 Calendar.getInstance()로 가져온 뒤 cal.get(Calendar.YEAR) cal.get(Calendar.DAY_OF_MONTH)처럼 가져오면 됨.
+3. res/raw/raw에 저장하면 openRawResourse()메서드로 접근가능하며 FileInputStream이 아닌 InputStream클래스를 사용한다. 읽기전용으로만 사용가능하다. var inputS=resource.openRawResource(R.raw.raw_test); var txt=ByteArray(inputS.available()); inputS.read(txt); inputS.close()
+inputS.available()은 읽을 수 있는 최대 크기를 리턴.
+4. SD카드는 여러 응용 프로그램에서 사용되는 경우 활용하며 특별한 인증절차 없이 접근가능 /sdcard/폴더나 /storage/emulated/0/
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>와 application 내에 android:requestLegacyExternalStorage="true" 설정이 필요!
+    코틀린에서 ActivityCompat.requestPermissions(this, arrayOf(android.Manifeat.permission.WRITE_EXTERNAL_STORAGE), Context.MODE_PRIVATE)로 권한요청을 수행하고 사용. FileInputStream("/storage/emulated/0/a.txt")
+5. 그림그릴 땐 VIew클래스에 onDraw()함수를 오버라이드하는데, try catch로 감싸고 imagePath가 존재할 경우 아래와 같이 수행한다.
+var bitmap=BitmapFactory.decodeFile(imagePath) //경로로부터 이미지 읽기
+canvas.scale(2f, 2f, 0f, 0f)
+canvas.drawBitmap(bitmap!!, 0f, 0f, null)
+bitmap!!.recycle()
+그리고 xml에서 <com.cookandroid.project8_2.myPictureVIew/>로 직접 넣어버린다.
+    그리고 코틀린에서 imageFiles=File(Environment.getExternalStorageDirectory().absolutePath+"/Pictures").listFiles()하고
+mypicture.imagePath=imageFiles!![0].toString()로 경로 설정!
+
+참고1) SD 디렉토리 생성 var dir=FILE(Environment.getExternalStorageDirectory().absolutePath+"/mydir"); dir.mkdir()현재 경로 없으면 개척
+참고2) 시스템파일 FILE(Environment.getRootDirector().aobolutePath).listFiles() 이터레이터 돌리고 isDirectory==true면 toString()
+
+[Chap09. 그래픽과 이미지]
+1. 그릴 땐 setContentView(MyGraphicView(this))로 사용. 그리고 커스텀한 MyGraphicView는 onDraw를 오버라이딩. drawLine좌표값은 float임 Rect는 RectF가 따로 있음. canvas.drawRoundRect 등이 있다. 여러선 그리기는 val path=Path(); path.lineTo(60f, 340f)로 추가하고 canvas.drawPath(path)로하면 됨.
+2. Paint()객체의 옵션으로는 .isAntiAlias .color .stokeWidth .style=Paint.Style.FILL .maskFilter
+3. 터치이벤트는 MyGraphicView에서 onTouchEvent를 오버라이딩하면되는데, when (event!!.action){ MotionEvent.ACTION_DOWM->{ startX=event.x.toInt()}}처럼 사용. MotionEvent에 이벤트 액션이 분류되어있고, event.x로 좌표 접근이 가능. ACTION_MOVE, ACTION_UP
+4. BitmapFactory.decodeResource(resources, R.drawable...)도 가능 like decodeFile
+5. Canvas의 메서드로 .rotate(45f, cenX, cenY) .scale(dx, dy) .translate(dx, dy, cenX, cenY) .skew(0.3f, 0.3f)가 있다.
+6. paint.maskFilter=BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL) //INNER(안된거같음), OUTER(액자야?), SOLID(딱딱해보임)
+7. 엠보싱: 볼록하게 튀어나온 느낌 EmbossMaskFilter(floatArrayOf(3f, 3f, 3f), 0.5f, 5f, 10f)빛의 xyz좌표, 밝기, 반사계수, 블러링정도
+8. 컬러매트릭스: ColorMatrix(floatArray(4x5배열))_색상이나 밝기 조절. 열은 R G B Alpha Brightness()임. 양수는 밝아지고 음수는 어두워짐
+9. 블러링, 엠보싱을 위해서 하드웨어 가속기기능을 꺼야하는데 매니패스트에서 android:hardwareAccelerated="false"
+10. 포토샵 예제에서 LinearLayout(사진레이아웃)을 가져와서 MyGraphicView(this)한 반환값을 저기에 picture.Layout.addView(graphicView)로 매핑했네. 그전까지는 setContentView(MyGraphicView(this))를 했는데 주요 레이아웃에 추가해서 매핑한듯.
+11. companion object{ var sX=1f; var sY=1f }로 변수 와리가리하고, 아이콘 클릭하는 이벤트 등록 시 graphicView.invalidate()로 변경사항 반영시켜야함. 흑백변환은 컬러매트릭스에 cm.setSaturation(satur)하면 됨. satur=1이 흑백 satur=0이 일반
+
+[Chap10. 액티비티와 인텐트]
+***1. 안드로이드 4대 컴포넌트: 액티비티, 서비스, 브로드캐스트 리시버, 콘텐트 프로바이더
+    -액티비티: 화면을 구성하는 가장 기본컴포넌트(MainActivity.kt가 해당. xml은 아니다!!!!)
+    -서비스: 화면과 상관없이 백그라운드에서 동작하는 컴포넌트(서비스 생성->서비스 시작->서비스 종료)
+    -브로드캐스트 리시버: 여러 응용 프로그램이나 장치에 메시지를 전달하기 위해 사용하는 방송메시지(문자도착, 배터리방전)
+    -콘텐트 프로바이더: 응용프로그램 간 데이터 공유를 위한 컴포넌트(자신의 데이터를 외부에 공개하기 위해 사용. URI_Uniform Resource Identifier는 콘텐트 프로바이더의 정보제공 방법이다.)
+2. 세컨트 액티비티는 그냥 Activity()상속시키고 onCreate만 구현하면 됨. 그래서 SecondActivity.kt에서 끝내는 버튼은 콜백에서 finish()
+    세컨트 액티비티 열기위해서는 var intent=Intent(applicationContext, SecondActivity::class.java); startActivity(intent)로 수행.
+이 때 사용될 액티비티는 매니페스트에 등록해야한다. <application>안에서 <activity android:name=".SecondActivity" android:label="Second 액티비티"/> name에 쩜 넣는거 주의!!!
+3. 인텐트는 안드로이드 4대 컴포넌트(액티비티, 서비스, 브로드캐스트 리시버, 컨텐트 프로바이더)가 서로 데이터를 주고받기 위한 객체로 명시적 인텐트와 암시적 인텐트로 구분된다. 위에 사용한 것 처럼 명확히 다른 액티비티 이름(SecondActivity::class.java)를 명시. 이때 intent.putExtra()로 모델처럼 데이터를 주고 intent.getStringExtra() intent.getIntArrayExtra 같이 받을 수 있다.
+4. 명화 추천 예제 <TableLayout stretchColumns="0"속성을 주었음.> 그리고 내부는 <Table Row>에 <TextView등을 넣어 한줄한줄 완성.
+
+5. 양방향 액티비티: 메인->세컨드 후 세컨드->메인인 경우 처음에 putExtra는 동일하지만, 세컨드에서 데이터를 다시 메인으로 보내려면 인텐트에 데이터 담고 finish()전에 setResult(Activity.RESULT_OK, outIntent)로 돌려준 다. 메인에서는 최초 세컨드 액티비티 호출할 때 startActivityForResult(intent, 0)메서드를 사용한다. 메인은 onActivityResult()메서드를 오버라이딩 해서 그 안에 getExtra()로 데이터를 받는다. resultCode==Activity.RESULT_OK인 경우에 데이터를 가져오자. 참고호 data!!.getIntExtra("Hap", 0)에서 0은 기본값. 참고로 세컨드에선 onCreate에 이미 intent에 접근가능하다. 바로  사용하면 됨.
+
+6. 암시적 인텐트: 약속한 액션을 지정하여 안드로이드에서 제공하는 기존 응용 프로그램 실행
+    -전화걸기 intent=Intent(Intent.ACTION_DIAL, Uri.parse("tel:010-1234-5678"))
+    -웹열기 intent=Intent(Intent.ACTION_VIEW, Uri.parse("http://www.naver.com"))
+    -지도 intent=Intent(Intent.ACTION_VIEW, Uri.parse("구글지도"+37.2+","+126.4)
+    -구글검색 intent=Intent(Intent.ACTION_WEB_SEARCH); intent.putExtra(SearchManager.QEURY, "사과")
+    -문자 intent=Intent(Intent.ACTION_SENDTO); intent.putExtra("sms_body", "안녕"); intent.data=Uri.parse("smsto:"+Uri.encode("010-1234-5678")) //와우 sms body넣고 데이터로 smsto: 를 따로 넣넹..이거 근데 그냥 넣어도 됨
+    -사진 intent=Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+<uses-permission android:name="android.permission.CALL_PHONE"/><"android:permission.ACCESS_COARSE_LOCATION"> <"android.permission.ACCESS_FINE_LOCATION">권한설정필요.
+
+***7. 액티비티 생명주기: 실행되면 onCreate(), onStart(), onResume()이 수행 / 종료되면 onPause(), onStop(), onDestroy()가 수행
+    다른 액티비티를 요청하면 onPause(), onStop()수행하고 종료되면 onRestart(), onStart(), onResume() **onRestart()뺴면 똑같음
+8. 로그남기기 android.util.Log.i("액티비티 테스트", "onCreate()")
+
+참고) intent.getStringArrayExtra("명화이름")같은거 받고 for(i in voteResult!!.indices)로 이터레이션하자.
+
+VIew.VISIBLE
+chrono.base=SystemClock.elapsedRealtime()
+탭호스트 아이디 "@android:id/tabhost"임 @+id/tabhost아님 그리고 TabActivity()상속
+액션바, 프래그먼트(액티비티보다 작은화면) TabListener를 장착하고 사용. ActionBar.NAVIGATION_MODE_TABS / data=arguments, .getString("tabName")
+
+shouldOverrideUrlLoading in CookWebViewClient
+registerForContextMenu(button1) if view===button1 onCreateContextMenu() onOptionsItemSelected<->onContextItemSelected
+dialog=View.inflate(this@MainActivity, R.dialog, null) / AlertDialog.Builder(this@MainActivity) / dlg.setView(dialog)
+
+FileOutputStream, openFileOutput( ,Context.MODE_PRIVATE) / resoueces.openRawResource(R.raw.raw)
+paint.style=Paint.Style.FILL / path .moveTo .lineTo / onTouchEvent, when(event.action), MotionEvent.ACTION_DOWN / this.invalidate()
+
+BitmapFactory.decodeResource(resources, R.) / paint.maskFilter=BlurMaskFilter(30f, BlurMaskFilter.Blur.NORMAL) EmbossMaskFilter(floatArrayOf(3f,3f,3f), 0.5f, 5f, 10f)
+paint.colorFilter=ColorMatrixColorFilter(floatArray)
+

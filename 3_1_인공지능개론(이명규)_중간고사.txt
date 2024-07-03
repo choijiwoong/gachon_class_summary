@@ -1,0 +1,147 @@
+[FAQ]
+1. 인공지능에서 지능이란? 인간의 인지적인 기능을 흉내 내어서 문제를 해결하기 위하여 ***학습하고 이해***하는 능력
+2. 인공지능의 종류 3가지는? 입력값과 입력값에 대한 label을 학습시키는 지도학습, label이 있는 데이터를 label없는 데이터 그룹화 시 사용하는 반지도학습, 입력값만 주고 규칙성을 찾는 비지도학습, 데이터에 대한 정답없이 모델이 한 행동에 대한 보상을 받으며 학습하는 강화학습이 있다.
+3. 전통적인 프로그래밍과 AI의 차이점은? 입력에서 출력까지의 과정을 인간이 설계하는 반면, 인공지능은 기계가 설계한다.
+4. 딥러닝과 머신러닝의 차이점은? 머신러닝은 입력값으로 추출된 feature을 넣어줘야하지만, 딥러닝은 입력값의 feature를 알아서 추출한다(feature넣어도됨)
+5. 분류와 회귀의 차이점은? 출력으로 이산적인 값을, 연속적인 값을 출력한다.(ex MNIST는 딥러닝밖에 못함)
+6. 머신러닝에서 ***차원의 저주***란? 차원(feature)이 증가하여 데이터밀도가 급격히 감소하여 데이터 분석이나 머신러닝 모델에 부정적인 영향을 끼치는 것
+7. 차원 감소의 필요성? 차원의 저주(과대적합)를 피하여 모델을 단순하고 효율적으로 구축하기 위해 feature selection, feature extraction(주성분추출)을 수행한다.
+8. 릿지와 랏소의 공통점과 차이점? 과대적합을 막기 위해 선형 회귀 모델에 규제를 추가한 모델이다. 라쏘는 가중치들이 0이 되게 하고, 릿지는 가중치들이 0에 가까워지게 한다.
+9. 과대적합과 과소적합? 과대적합은 ***분산이 높아*** 새로운 데이터에 잘 맞지않고, 과소적합은 ***편향이 높아*** 모델이 너무 단순하여 학습 데이터에 잘 맞지않다. 분산은 모델과 값들이 얼마나 가까운지(가까워야함), 편향은 모델과 값들의 차이가 평균 얼마(줄여야함)인지이다.
+10. ***특성공학***과 특성선택의 차이? 특성공학은 좋은 특성을 찾는 것으로 특성선택과 특성추출이 있다. 특성 선택은 특성 중 유용한 특성을 선택하는 방법
+11. 전처리의 목적과 방법? 결측값, 노이즈, 이상치 등 오류요인을 사전에 정제(삭제, 대체)하는 것. 상한&하한값, 평균표준편차, p번째 백분위 등으로 범위 외 값들을 ***삭제, 대체, 스케일링, 정규화***하여 수행한다.
+12. ***EDA***란? 데이터를 다양한 관점에서 관찰하고 이해하는 것으로, 이상값을 찾아내기위해 분포같은 통계지표를 사용하거나 특성간 상관관계를 찾는다.
+13. 회귀에서 절편과 기울기는? 딥러닝과의 연관? 기울기는 ***독립변수X와 종속변수Y간의 관계***를 의미하며, 절편은  x가 0일때의 예측값을 의미한다. 딥러닝은 예측값과 관측값의 오차를 최소화하는 기울기와 절편값을 찾아 가장 잘 맞는 예측을 하는 회귀선을 얻어내는 것이다.
+14. 활성화함수의 사용 이유? softmax와 sigmoid차이? 비선형적인 활성화함수를 사용하지 않으면 다차함수 층 1개의 기능밖에 수행하지 못하기에 층을 쌓기위해 사용한다. sigmoid는 퍼셉트론 출력이 0과 1인 경우에만 사용하며, softmax는 출력이 여러개인 경우 총합이 1이되는 확률값으로 매핑시킨다.
+15. 순전파와 역전파란? 모델의 입력층->출력층까지 순차적 계산을 의미하며, 후자는 오차 최소화를 위해 손실함수 미분을 통해 가중치를 업데이트 하기위한 과정을 의미
+16. 손실함수란? 예측값과 실제값의 유사도를 판단하는 기준으로 회귀에 Mean Absolute Error, Mean Squared Error가, 분류엔 Binary CrossEntropy, Categorical CrossEntropy등이 있다.
+17. 옵티마이저와 손실함수의 차이점? 최적의 가중치로 업데이트 하기 위해 손실함수로 계산한 손실을 이용하여 가중치 조정정도를 결정한다.
+18. 경사하강법? 손실함수의 값을 최소화하는 파라미터를 구하기 위해 미분값을 빼서 손실최저지점으로 이동시키는 알고리즘. 배치경사하강법은 반복마다 전체 데이터샘플의 기울기를 계산해 시간이 오래걸리고, 확률적경사하강법은 훈련데이터에서 랜덤데이터 하나에 대해 업데이트하며, 미니배치경사하강법은 작은 그룹의 평균기울기로 업데이트 하는 방식으로 ***가장 빠르다.***
+19. ***K-fold 교차검증***의 의미? 교차검증은 데이터를 나누어 훈련과 테스트용으로 번갈아 사용하며 평가하는 방법인데, 그 중 데이터 셋을 K개로 나누어 하나의 폴드를 테스트로, K-1개 폴드를 훈련 데이터로 교차하며 과대적합과 과소적합을 방지한다.
+20. 하이퍼 파라미터 튜닝? 모델 내부에서 결정되는 파라미터말고 학습률, 손실함수, 배치 사이즈 등 모델 학습 과정에 반영되는 값을 조정하는 것.
+
+[Chap01. 인공지능이란?]
+1. 인간처럼 학습하고 추론하는 프로그램 연구(인공지능) > 인공지능의 한 분야로 프로그래밍 없이 스스로 학습하는 프로그램 연구(머신러닝) > 인공신경망 등을 사용하여 빅데이터로부터 학습하는 프로그램 연구(딥러닝)
+2. 인공지능의 정의(러셀) 인간처럼&합리적으로 사고&행동하기
+3. 튜링테스트: 질문자가 인간인지 컴퓨터인지 구분불가능하면 통과
+4. AI의 한계: 부족한 컴퓨팅파워, 데이터 부족, 레이블링의 한계
+5. 인공지능(머신러닝)은 특징을 추출하는 기계이다(***딥러닝은 아니다***)
+
+[Chap02. 파이썬과 넘파이 복습]
+1. mse=(np.square(ypred-y)).mean() # square는 제곱. 즉 오차 제곱 평균임. 말그대로 Mean Squared Error
+*2. 제곱하는 이유는 음수오차값이 양수오차를 상쇄할 수 있기에
+3. class Person:
+    def __init__(self, name, age):
+        self.name=name
+        self.age=age
+4. np.arange(12)하면 [0, ..., 11]
+5. pandas는 컬럼명 사용이 가능하여 drop이나 filter시에 편한데, 딥러닝 시 numpy로 변환해야한다.
+6. 머신러닝은 feature가 숫자여야하고 label은 문자여도 되며, 딥러닝은 feature와 label이 숫자여야한다. 인코딩필요
+7. 원핫인코딩은 레이블간의 관계를 동일하게 표현하기 위함이다.
+
+[Chap03. 머신러닝의 기초]
+1. 회귀는 MSE를, 분류는 정확도와 혼동행렬, f1-score를 사용
+*2. 전통적인 프로그래밍 (입력, 프로그램 코드)->출력 / 머신러닝 (입력, 출력)->프로그램 코드
+3. 지도학습(입력,출력), 비지도학습(입력), 강화학습(입력)+행동에 대한 피드백
+4. 회귀문제는 연속적인 수치값.
+5. 가중치와 바이어스를 업데이트 하는 각 반복을 뭐라하는가? 학습단계(step)
+6. 머신러닝 과정: 데이터수집->데이터정제(스케일링)->특성추출->특성선택->모델설계->훈련->테스트->하이퍼 파라미터 튜닝->성능측정
+7. KNN은 특성연관그래프에서 예측지점에서 가장 가까운 k개(2개이상)을 고르며 k값을 조정하여 ***knn elbow***를 찾는다.
+8. ***혼동행렬은 TP(1인정답) FP(1인줄) FN(0인줄) TN(0인정답). 뒤가 모델의 판단값임. x축이 true class, y축이 predict class***
+민감도(재현율)=TP/(TP+FN) 질병이 있는 사람을 환자라고 올바르게 진단하는 비율_헬스케어
+특이도=TN/(TN+FP) 질병이 없는 사람을 환자가 아니라고 올바르게 진단하는 비율
+정밀도=TP/(TP+FP) 질병 있다고 판단내린 것 중 진짜 질병 있던 비율
+F1=(2x정밀도x재현율)/(정밀도+재현율)
+9. F1-score의 이유는 TP같은 특정 분류가 상대적으로 높은 경우 다른 항목들이 무시되기에. ***높을수록 좋으며 0~1이다.***
+*10. F1-score와 accuracy의 차이는 데이터 불균형을 고려했는지
+11. MNIST reshape코드 data=digits.images.reshape((len(digits.images), -1))#이미지 개수외에는 나머지 flatten해서 몰빵
+
+[Chap04. 선형회귀]
+1. 모델이 단순하거나 데이터가 부족하면 과소적합, feature가 너무 많거나 데이터가 너무 많아 노이즈까지 반영되어 모델이 복잡해지고 민감해지면 과대적합.
+과대적합 시 특성을 줄이거나 규제(랏지, 리소)를 추가하여 모델을 단순화하면 된다.
+2. data argumentation은 데이터 증강
+
+[Chap05. 퍼셉트론]
+1. 손실이 작으면 argmin, 크면 argmax, 손실함수 작아지는걸 찾고싶으니 argmin?뭔소리래
+2. 결정트리는를 나눌 때 지니계수(불순도)가 0 혹은 1에 가깝게 구성한다.
+3. SVM은 결정경계(초평면)을 기준으로 +=margin만큼을 Soft Vector, 그 외를 Hard Vector로 soft vector들간의 margin을 최대화하는 W와 b를 찾는다.
+*4. one-hot encoding이 필요없는 경우 Spacial CrossEntropy를 사용.
+*5. DL의 중요요소: 순전파, 활성화함수, 손실함수, 역전파, 옵티마이저
+6. 간단한 계단함수 return x<0? 0: 1
+*7. 입출력값 주고 퍼셉트론 설계하라고하면 연립방정식(p.187)
+*******8. XOR문제를 해결하는 다층 퍼셉트론 p.183
+9. 퍼셉트론의 Bias는 ***뉴런이 얼마나 쉽게 활성화*** 되는가의 의미이며, 가중치는 입력이 출력에 미치는 중요도이다.
+10. 부동소수점 고려 ***epsilon***중요.
+def step_func(t, epsilon=0.0000001):
+    if t > epsilon:
+        return 1
+    else:
+	return 0
+11. sklearn의 퍼셉트론
+from sklearn.linear_model import Perceptron
+X=[[0,0], [0,1], [1,0], [1,1]]
+y=[0,0,0,1]
+clf=Perceptron(tol=1e-3, random_state=0)
+clf.fit(X,y)
+print(clf.predict(X))
+12. 교재 퍼셉트론에 활성화함수로 계단함수 있다고 생각. epsilon보다 크면 1을 작으면 0을.
+*****13. p.239의 4번
+14. 모델 훈련 시 검증데이터로 테스트 데이터를 넣으면 일반화가 떨어진다.
+15. DL시 label을 LabelEncoder->X y분리->one-hot encoding하며 numpy변환->입출력층->하이퍼조정
+16. def relu(x):
+	return np.maximum(0, x)
+
+[Chap06. 다층 퍼셉트론]
+1. ReLU의 장점: Gradient Vanishing방지, Tanh는 안정화
+2. MSE에서 제곱값에 1/2를 곱해주는 이유는 미분 시 ^2가 내려와 딱 정숟가 되게 하려고
+*3. 경사하강법 손실함수 X축은 w, Y축은 E(w)_손실함수 직접 구현 프로그램
+loss_func=lambda x: (x-3)**2+10
+gradient=lambda x: 2*x-6
+for i in range(100):
+    x=x-learning_rate*dradient(x)
+    print(loss_func(x))
+
+[그냥코드]
+1. 헤더 없으면 np.read_csv시 header=None. 따로 넣을거면 names=['petal width', ...] 만약 있다면 index_col=0
+2. X=df.drop('label', axis=1)축을 1로. 여러개 떨굴거면 ['label', ...]으로 해도 됨
+3. df['label'].value_counts()로 특정 레이블에 치우쳐져 있는지(클래스 불균형)확인. 모델이 특정 레이블에 편향되지 않도록
+   참고) sns.countplot(data=df, x="label")로 대충 하면 레이블 개수 나옴
+4. 결측치 확인은 df.isnull().sum()으로 확인, df.dropna()로 결측치 제거. 너무 많을경우 평균값으로 대체. 
+   df['Age'].fillna(df['Age'].mean(), inplace=True)
+5. 상관관계 산점도 plt.scatter(df['Survived'], df['Age'])
+6. 박스플롯 sns.boxplot(x="Age", data=df)
+7. 사이킷런 분류레포트 print(f"{metrics.classification_report(y_test, y_pred)}\n")
+
+8. 모든 모델은 과정을 따름(웬만하면 LabelEncoder().fit_transform()수행)
+model=LogisticRegression()
+model.fit(X_train, y_train)
+pred=model.predict(X_test)
+print(accuracy_score(y_test, pred))
+print(confusion_matrix(y_test, pred))
+print(f"{metrics.classification_report(y_test, pred)}\n")
+9. 회귀는 MSE를, 분류는 f1-score를 사용한다.
+from sklearn.metrics import mean_squared_error
+print('평균제곱근오차', mean_squared_error(pred1, y_test))#인데 그냥 다 test를 앞에두자. MSE는 차피 제곱합이라 상관없음
+10. 회귀, 분류 모델
+회귀: LinearRegression, RandomForestRegressor, DecisionTreeRegressor, SVR(kernel='linear') / mean_squared_error(test, pred)
+분류: LogisticRegression, RandomForestClassifier, DecisionTreeClassifier / accuracy_score(test, pred), confusion_matrix(test, pred), metrics.classification_report(test, pred)
+
+[DL]
+1. LabelEncoder이후 one-hot encoding(numpy화)가 필요
+y=df['activity_id']
+y=pd.get_dummies(y).values
+2. test와 pred값의 오차를 계산하기 위해 one-hot vector를 label로 변환필요
+y_test_class=np.argmax(y_test, axis=1)
+y_pred_class=np.argmax(y_pred, axis=1)
+3. 모델설계
+model = Sequential()
+
+model.add(Input((64,)))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(12,activation='softmax'))#중요. 마지막을 softmax로 한 뒤 compile시 categorical_crossentropy
+
+model.compile(Adam(learning_rate=0.001),'categorical_crossentropy',metrics=['accuracy'])#옵티마이져 with lr, 손실함수
+
+model.summary()
